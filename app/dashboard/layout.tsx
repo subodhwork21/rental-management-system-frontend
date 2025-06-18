@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -25,18 +25,6 @@ import Link from 'next/link';
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, logout, loading } = useAuth();
-  const router = useRouter();
-  
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/');
-    }
-  }, [user, loading, router]);
-
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Properties', href: '/dashboard/properties', icon: Home },
@@ -46,6 +34,29 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Maintenance', href: '/dashboard/maintenance', icon: Wrench },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const pathName = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout, loading } = useAuth();
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState('Dashboard');
+
+  
+
+  useEffect(() => {
+   const urlPath = pathName;
+   const activeTab = navigation.find(item => item.href === urlPath)?.name || 'Dashboard';
+   setActiveTab(activeTab);
+  }, [pathName]);
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
+
 
   const handleLogout = async () => {
     await logout();
@@ -102,14 +113,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         
         <nav className="flex-1 mt-6 px-3 overflow-y-auto">
           {navigation.map((item) => (
-            <Link
+            <p
+            onClick={() => {
+              router.push(item?.href)
+              setActiveTab(item.name)}}
               key={item.name}
-              href={item.href}
-              className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 mb-1 transition-colors"
+              // href={item.href}
+              className={`flex cursor-pointer ${activeTab === item.name ? 'bg-gray-600 text-white hover:bg-gray-500 hover:text-white' : ''} items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 mb-1 transition-colors`}
             >
-              <item.icon className="w-5 h-5 mr-3 text-gray-400" />
+              <item.icon className={`w-5 h-5 mr-3 ${activeTab === item.name ? 'text-white' : 'text-gray-400'}`} />
               {item.name}
-            </Link>
+            </p>
           ))}
         </nav>
       </div>

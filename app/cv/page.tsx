@@ -230,7 +230,7 @@ export default function SubodhCV() {
           {/* Projects Section */}
           <div>
             <h2 className="text-2xl font-bold text-slate-700 mb-6 border-b-2 border-teal-400 pb-2">Projects and Contributions</h2>
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-1">
               {cvData.projects.map((project, index) => (
                 <div key={index} className="bg-gray-50 p-3 rounded-lg">
                   <h3 className="font-semibold text-slate-700">{project}</h3>
